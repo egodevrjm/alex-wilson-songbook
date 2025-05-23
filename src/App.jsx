@@ -24,6 +24,7 @@ import DuplicateChecker from './components/DuplicateChecker.jsx';
 import GameView from './components/GameView.jsx';
 import EmptySongCleaner from './components/EmptySongCleaner.jsx';
 import ExportManager from './components/ExportManager.jsx';
+import ImportManager from './components/ImportManager.jsx';
 import SidebarWidthToggle from './components/SidebarWidthToggle.jsx';
 
 // Public Components
@@ -31,6 +32,7 @@ import PublicNavigation from './components/PublicNavigation.jsx';
 import PublicSongViewer from './components/PublicSongViewer.jsx';
 
 import { generateSlug } from './utils/helpers.js';
+import { initializeSampleData } from './utils/dataInitializer.js';
 
 // Loading Component
 const LoadingScreen = () => (
@@ -53,6 +55,7 @@ function AdminAppContent() {
   const [showSongCreator, setShowSongCreator] = useState(false);
   const [showEmptySongCleaner, setShowEmptySongCleaner] = useState(false);
   const [showExportManager, setShowExportManager] = useState(false);
+  const [showImportManager, setShowImportManager] = useState(false);
   
   // Use the song persistence hook
   const {
@@ -720,6 +723,21 @@ function AdminAppContent() {
                   <div className="space-y-4">
                     <div>
                       <p className="text-sm text-gray-600 mb-3">
+                        Import songs, images, and audio from a previously exported file.
+                      </p>
+                      <button
+                        onClick={() => setShowImportManager(true)}
+                        className={`px-4 py-2 bg-green-600 hover:bg-green-700 text-white ${theme.layout.borderRadius} flex items-center transition-colors duration-200`}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        Import Songs
+                      </button>
+                    </div>
+                    
+                    <div className="pt-4 border-t border-gray-200">
+                      <p className="text-sm text-gray-600 mb-3">
                         Export all songs to various formats for backup or sharing.
                       </p>
                       <button
@@ -826,6 +844,17 @@ function AdminAppContent() {
         <ExportManager 
           songs={availableSongs}
           onClose={() => setShowExportManager(false)}
+        />
+      )}
+      
+      {/* Import Manager Modal */}
+      {showImportManager && (
+        <ImportManager 
+          onClose={() => setShowImportManager(false)}
+          onImportComplete={() => {
+            setShowImportManager(false);
+            // The ImportManager will reload the page automatically
+          }}
         />
       )}
     </div>
@@ -1038,6 +1067,11 @@ function PublicAppContent() {
 // Main App Container
 function AppContainer() {
   const { isAdmin, isPublicView, isLoading } = useAuth();
+
+  // Initialize sample data on first load
+  React.useEffect(() => {
+    initializeSampleData();
+  }, []);
 
   if (isLoading) {
     return <LoadingScreen />;
