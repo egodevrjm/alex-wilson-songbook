@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alex Wilson Songbook - Storage Cleanup</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .warning {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .stats {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        button.danger {
+            background: #ef4444;
+        }
+        button.danger:hover {
+            background: #dc2626;
+        }
+        .log {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+        .success {
+            color: #10b981;
+            font-weight: bold;
+        }
+        .error {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Alex Wilson Songbook - Storage Cleanup</h1>
+        <p>This tool helps free up localStorage space to fix quota errors.</p>
+        
+        <div class="warning">
+            <strong>⚠️ Important:</strong> This cleanup is necessary because localStorage is full. 
+            The app will migrate your songs to a better storage system after cleanup.
+        </div>
+
+        <div class="stats" id="stats">
+            <strong>📊 Storage Analysis:</strong><br>
+            <span id="statsContent">Click "Analyze Storage" to begin...</span>
+        </div>
+
+        <div>
+            <button onclick="analyzeStorage()">📊 Analyze Storage</button>
+            <button onclick="backupData()" id="backupBtn" disabled>💾 Backup Data</button>
+            <button onclick="cleanupStorage()" class="danger" id="cleanupBtn" disabled>🗑️ Clean Up Storage</button>
+            <button onclick="window.location.href='./index.html'" disabled id="continueBtn">➡️ Continue to App</button>
+        </div>
+
+        <div class="log" id="log" style="display: none;"></div>
+    </div>
+
+    <script>
+        let storageData = null;
+        let backup = null;
+
+        function log(message, type = 'info') {
+            const logEl = document.getElementById('log');
+            logEl.style.display = 'block';
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : (type === 'success' ? 'success' : '');
+            logEl.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function analyzeStorage() {
+            log('Starting storage analysis...');
+            
+            const keys = Object.keys(localStorage);
+            storageData = {
+                lyrics: [],
+                notes: [],
+                title: [],
+                soundsLike: [],
+                image: [],
+                audio: [],
+                customSongs: null,
+                deletedSongs: null,
+                other: []
+            };
+
+            // Categorize keys
+            keys.forEach(key => {
+                if (key.startsWith('lyrics-')) storageData.lyrics.push(key);
+                else if (key.startsWith('notes-')) storageData.notes.push(key);
+                else if (key.startsWith('title-')) storageData.title.push(key);
+                else if (key.startsWith('soundsLike-')) storageData.soundsLike.push(key);
+                else if (key.startsWith('image-')) storageData.image.push(key);
+                else if (key.startsWith('audio-')) storageData.audio.push(key);
+                else if (key === 'custom-songs') storageData.customSongs = key;
+                else if (key === 'deleted-songs') storageData.deletedSongs = key;
+                else storageData.other.push(key);
+            });
+
+            // Calculate sizes
+            let totalSize = 0;
+            keys.forEach(key => {
+                const value = localStorage.getItem(key);
+                if (value) {
+                    totalSize += key.length + value.length;
+                }
+            });
+
+            // Update stats display
+            const statsHtml = `
+<strong>📊 Storage Analysis Complete:</strong>
+Total keys: ${keys.length}
+Total size: ${(totalSize / 1024 / 1024).toFixed(2)} MB
+
+Song data entries:
+- Lyrics: ${storageData.lyrics.length}
+- Notes: ${storageData.notes.length}
+- Titles: ${storageData.title.length}
+- Sounds Like: ${storageData.soundsLike.length}
+- Images: ${storageData.image.length}
+- Audio: ${storageData.audio.length}
+
+Other entries:
+- Custom songs: ${storageData.customSongs ? 'Yes' : 'No'}
+- Deleted songs: ${storageData.deletedSongs ? 'Yes' : 'No'}
+- Other keys: ${storageData.other.length}
+            `;
+            
+            document.getElementById('statsContent').innerHTML = statsHtml;
+            document.getElementById('backupBtn').disabled = false;
+            document.getElementById('cleanupBtn').disabled = false;
+            
+            log(`Analysis complete. Found ${keys.length} keys using ${(totalSize / 1024 / 1024).toFixed(2)} MB`, 'success');
+        }
+
+        function backupData() {
+            log('Creating backup...');
+            
+            backup = {
+                timestamp: new Date().toISOString(),
+                customSongs: localStorage.getItem('custom-songs'),
+                deletedSongs: localStorage.getItem('deleted-songs'),
+                songs: {}
+            };
+
+            // Extract song data
+            const songSlugs = new Set();
+            [...storageData.lyrics, ...storageData.notes, ...storageData.title, 
+             ...storageData.soundsLike, ...storageData.image, ...storageData.audio].forEach(key => {
+                const parts = key.split('-');
+                if (parts.length >= 2) {
+                    const slug = parts.slice(1).join('-');
+                    songSlugs.add(slug);
+                }
+            });
+
+            // Build song objects from localStorage
+            songSlugs.forEach(slug => {
+                backup.songs[slug] = {
+                    slug,
+                    title: localStorage.getItem(`title-${slug}`) || slug,
+                    lyrics: localStorage.getItem(`lyrics-${slug}`) || '',
+                    notes: localStorage.getItem(`notes-${slug}`) || '',
+                    soundsLike: localStorage.getItem(`soundsLike-${slug}`) || '',
+                    image: localStorage.getItem(`image-${slug}`),
+                    audio: localStorage.getItem(`audio-${slug}`)
+                };
+            });
+
+            // Download backup
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `songbook-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            log(`Backup created with ${Object.keys(backup.songs).length} songs`, 'success');
+        }
+
+        function cleanupStorage() {
+            if (!confirm('This will remove individual song entries from localStorage to free up space. The app will migrate your data to a better storage system. Continue?')) {
+                return;
+            }
+
+            log('Starting cleanup...');
+            
+            let removed = 0;
+            const keysToRemove = [
+                ...storageData.lyrics,
+                ...storageData.notes,
+                ...storageData.title,
+                ...storageData.soundsLike,
+                ...storageData.image,
+                ...storageData.audio
+            ];
+
+            // Remove in batches to avoid overwhelming the browser
+            const batchSize = 50;
+            let index = 0;
+
+            function removeBatch() {
+                const batch = keysToRemove.slice(index, index + batchSize);
+                batch.forEach(key => {
+                    try {
+                        localStorage.removeItem(key);
+                        removed++;
+                    } catch (error) {
+                        log(`Failed to remove ${key}: ${error.message}`, 'error');
+                    }
+                });
+
+                index += batchSize;
+                
+                if (index < keysToRemove.length) {
+                    log(`Removed ${removed}/${keysToRemove.length} entries...`);
+                    setTimeout(removeBatch, 10);
+                } else {
+                    // Cleanup complete
+                    log(`Cleanup complete! Removed ${removed} entries`, 'success');
+                    
+                    // Re-analyze to show new stats
+                    analyzeStorage();
+                    
+                    // Enable continue button
+                    document.getElementById('continueBtn').disabled = false;
+                    
+                    log('You can now continue to the app. It will migrate your remaining data automatically.', 'success');
+                }
+            }
+
+            removeBatch();
+        }
+    </script>
+</body>
+</html>

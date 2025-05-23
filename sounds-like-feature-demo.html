@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alex Wilson Songbook - Updated with Sounds Like Feature</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .feature-demo {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .sounds-like-example {
+            background: #fef7e7;
+            border: 1px solid #f6d55c;
+            padding: 15px;
+            border-radius: 6px;
+            font-style: italic;
+            color: #744210;
+        }
+        .code-example {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        ul {
+            line-height: 1.6;
+        }
+        .highlight {
+            background: #e3f2fd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 Alex Wilson Songbook - "Sounds Like" Feature</h1>
+    
+    <div class="feature-demo">
+        <h2>✨ What's New</h2>
+        <p>The Alex Wilson Songbook now includes a <strong>"What it sounds like"</strong> section for each song! This feature allows you to describe the musical style, instrumentation, and atmosphere of your songs.</p>
+        
+        <div class="sounds-like-example">
+            <strong>Example:</strong> "Rousing acoustic guitar with a warm, communal country-barroom vibe; fiddle as subtle punctuation. Barroom anthem"
+        </div>
+    </div>
+
+    <div class="feature-demo">
+        <h2>🤖 AI Integration</h2>
+        <p>The feature includes AI-powered generation using Google's Gemini API. You can:</p>
+        <ul>
+            <li>Manually write your own descriptions</li>
+            <li>Use AI to generate descriptions based on your lyrics</li>
+            <li>Edit and refine the generated content</li>
+        </ul>
+    </div>
+
+    <div class="feature-demo">
+        <h2>🔧 Technical Implementation</h2>
+        <p>Here's what was added to the codebase:</p>
+        
+        <h3>1. Data Structure Updates</h3>
+        <div class="code-example">
+// Added to song objects in src/data/songs.js
+{
+  title: "Song Title",
+  lyrics: "...",
+  notes: "...",
+  soundsLike: "Musical description here", // ← New field
+  // ... other fields
+}
+        </div>
+
+        <h3>2. Component Updates</h3>
+        <ul>
+            <li><span class="highlight">SongViewer.jsx</span> - Added display and editing interface for soundsLike</li>
+            <li><span class="highlight">SongCreator.jsx</span> - Added soundsLike field to song creation form</li>
+            <li><span class="highlight">server.js</span> - Uses existing Gemini endpoint for AI generation</li>
+        </ul>
+
+        <h3>3. AI Generation Prompt</h3>
+        <div class="code-example">
+// The AI prompt focuses on:
+- Instrumentation (guitar, fiddle, drums, etc.)
+- Musical style and genre  
+- Tempo and energy level
+- Atmosphere and mood
+- Specific musical arrangements or production style
+
+// Keeps descriptions concise (1-2 sentences) and evocative
+        </div>
+    </div>
+
+    <div class="feature-demo">
+        <h2>🎸 Perfect for the Alex Wilson Character</h2>
+        <p>This feature is perfectly suited for Alex Wilson's Appalachian country music, allowing for descriptions like:</p>
+        <ul>
+            <li>"Sparse acoustic picking with mournful fiddle"</li>
+            <li>"Driving country-rock groove with lively fiddle breaks"</li>
+            <li>"Raw acoustic with coal-black harmonies"</li>
+            <li>"Anthemic acoustic rhythm with stomp-along beat"</li>
+        </ul>
+    </div>
+
+    <div class="feature-demo">
+        <h2>🚀 How to Use</h2>
+        <ol>
+            <li>Open any song in the songbook</li>
+            <li>Look for the "What it sounds like" section below the title</li>
+            <li>Click "Edit" to manually add a description</li>
+            <li>Click "AI Generate" to create one automatically based on the lyrics</li>
+            <li>Save your changes</li>
+        </ol>
+    </div>
+
+    <div class="feature-demo">
+        <h2>💾 Data Persistence</h2>
+        <p>The soundsLike field is saved to localStorage alongside other song data, ensuring your musical descriptions persist across sessions.</p>
+    </div>
+
+    <style>
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+        }
+    </style>
+    
+    <div class="footer">
+        <p>🎼 Ready to describe the sound of your songs? Start the application and explore the new feature!</p>
+    </div>
+</body>
+</html>

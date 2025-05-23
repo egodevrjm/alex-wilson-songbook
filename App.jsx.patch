@@ -1,0 +1,32 @@
+// App.jsx Integration Changes for Storage Migration Fix
+// 
+// This shows the exact changes needed in App.jsx to fix the localStorage quota error
+
+// CHANGE 1: Update the imports at the top of App.jsx
+// 
+// Replace these lines (around line 6-8):
+// OLD:
+import { useSongPersistence } from './hooks/useSongPersistence.js';
+import SongCreator from './components/SongCreator.jsx';
+
+// NEW:
+import { useSongPersistence } from './hooks/useSongPersistenceV2.js';
+import SongCreator from './components/SongCreatorV2.jsx';
+
+// That's it! No other code changes are needed.
+// The new components have the same API as the old ones.
+
+// WHAT THIS DOES:
+// 1. useSongPersistenceV2 - Uses IndexedDB instead of localStorage for song data
+// 2. SongCreatorV2 - Creates songs using the new storage system
+// 3. Automatic migration - First load will migrate existing localStorage data
+
+// TESTING:
+// After making these changes:
+// 1. Refresh the browser
+// 2. Check that all existing songs are still there
+// 3. Try creating a new song - it should work without quota errors
+// 4. Check browser console for any errors
+
+// ROLLBACK:
+// If needed, simply revert the import changes to go back to the old system

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Global createSongFromPrompt Function</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2563eb;
+        }
+        .card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        button:hover {
+            background-color: #1d4ed8;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+        }
+        pre {
+            background-color: #f3f4f6;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .error {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        .success {
+            color: #10b981;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Global createSongFromPrompt Function</h1>
+    
+    <div class="card">
+        <h2>Enter Prompt for Song Generation</h2>
+        <input type="text" id="promptInput" placeholder="Enter your prompt here..." value="A song about overcoming challenges">
+        <button id="generateBtn">Generate Song</button>
+        <button id="checkServerBtn">Check Server Status</button>
+        
+        <div id="status" style="margin-top: 16px;"></div>
+    </div>
+    
+    <div class="card">
+        <h2>Result</h2>
+        <pre id="result">Results will appear here...</pre>
+    </div>
+    
+    <div class="card">
+        <h2>Debugging</h2>
+        <p>This page helps test if the global <code>createSongFromPrompt</code> function is working correctly.</p>
+        <ol>
+            <li>Make sure your server is running with: <code>node server.js</code></li>
+            <li>Open the Alex Wilson Songbook app in another tab</li>
+            <li>Try generating a song using the form above</li>
+            <li>Check console logs for detailed error information</li>
+        </ol>
+    </div>
+    
+    <script>
+        document.getElementById('generateBtn').addEventListener('click', async function() {
+            const statusEl = document.getElementById('status');
+            const resultEl = document.getElementById('result');
+            const prompt = document.getElementById('promptInput').value.trim();
+            
+            if (!prompt) {
+                statusEl.innerHTML = '<span class="error">Please enter a prompt</span>';
+                return;
+            }
+            
+            statusEl.innerHTML = 'Generating song...';
+            resultEl.textContent = 'Working...';
+            
+            try {
+                // Check if the global function exists
+                if (typeof window.createSongFromPrompt !== 'function') {
+                    throw new Error('Global function createSongFromPrompt is not available. Make sure you have the app open in another tab.');
+                }
+                
+                // Call the global function
+                const result = await window.createSongFromPrompt(prompt);
+                
+                if (!result) {
+                    throw new Error('Function returned null or undefined result');
+                }
+                
+                // Display the result
+                statusEl.innerHTML = '<span class="success">Song generated successfully!</span>';
+                resultEl.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                statusEl.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+                resultEl.textContent = `Error occurred: ${error.message}\n\nMake sure:\n1. The app is open in another tab\n2. The server is running\n3. Your API key is valid`;
+                console.error('Song generation error:', error);
+            }
+        });
+        
+        document.getElementById('checkServerBtn').addEventListener('click', async function() {
+            const statusEl = document.getElementById('status');
+            
+            statusEl.innerHTML = 'Checking server status...';
+            
+            try {
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: 'Hello, are you working?',
+                        temperature: 0.1
+                    }),
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    statusEl.innerHTML = '<span class="success">Server is running and responding!</span>';
+                } else {
+                    const errorText = await response.text();
+                    statusEl.innerHTML = `<span class="error">Server returned an error: ${response.status} ${response.statusText}</span>`;
+                    console.error('Server error:', errorText);
+                }
+            } catch (error) {
+                statusEl.innerHTML = `<span class="error">Could not connect to server: ${error.message}. Make sure server.js is running.</span>`;
+                console.error('Server connection error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

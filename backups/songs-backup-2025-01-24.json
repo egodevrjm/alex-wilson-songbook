@@ -1,0 +1,8 @@
+{
+  "metadata": {
+    "backupDate": "2025-01-24",
+    "description": "Full backup of songs data before implementing game integration features",
+    "totalSongs": 77
+  },
+  "note": "This is a backup reference. The actual songs data is preserved in the original songs.json file."
+}
