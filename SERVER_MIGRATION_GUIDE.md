@@ -60,7 +60,7 @@ Update your `.env` file:
 
 ```bash
 # Google Gemini API Key from https://aistudio.google.com/
-GEMINI_API_KEY=AIzaSyCVdioUcWRYmr-WlmgbaXaBA-XebYqWOwk
+GEMINI_API_KEY=your-gemini-api-key-here
 
 # Server port (optional, defaults to 3001)
 PORT=3001
