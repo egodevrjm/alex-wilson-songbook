@@ -4,8 +4,8 @@ import { MusicPlayerProvider } from './contexts/MusicPlayerContext';
 import { GameStateProvider, useGameState } from './contexts/GameStateContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { generateSongFromPrompt } from './services/SongGenerationService.js';
-import { useSongPersistence } from './hooks/useSongPersistenceV2.js';
-import { useAlbumPersistence } from './hooks/useAlbumPersistence.js';
+import { useServerSongPersistence } from './hooks/useServerSongPersistence.js';
+import { useServerAlbumPersistence } from './hooks/useServerAlbumPersistence.js';
 import { songs as initialSongs } from './data/songs.js';
 
 // Admin Components
@@ -57,7 +57,7 @@ function AdminAppContent() {
   const [showExportManager, setShowExportManager] = useState(false);
   const [showImportManager, setShowImportManager] = useState(false);
   
-  // Use the song persistence hook
+  // Use the server-side song persistence hook
   const {
     availableSongs,
     filteredSongs, 
@@ -74,20 +74,24 @@ function AdminAppContent() {
     handleDeleteSong: hookDeleteSong,
     handleSongCreated: hookSongCreated,
     handleSongUpdated,
-    removeDuplicateSongs
-  } = useSongPersistence(initialSongs);
+    removeDuplicateSongs,
+    isLoading,
+    reloadSongs
+  } = useServerSongPersistence();
   
-  // Use the album persistence hook
+  // Use the server-side album persistence hook
   const {
     albums,
     isLoaded: albumsLoaded,
+    isLoading: albumsLoading,
     createAlbum,
     updateAlbum,
     deleteAlbum,
     addSongToAlbum,
     removeSongFromAlbum,
-    reorderSongs
-  } = useAlbumPersistence();
+    reorderSongs,
+    reloadAlbums
+  } = useServerAlbumPersistence();
   
   // Get the selected song
   const selectedSong = availableSongs.length > 0 && selectedIndex >= 0 ? 
@@ -867,7 +871,7 @@ function PublicAppContent() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState('songs');
   
-  // Use the same song persistence hook for consistency
+  // Use the server-side song persistence hook for shared data
   const {
     availableSongs,
     filteredSongs, 
@@ -879,14 +883,15 @@ function PublicAppContent() {
     setSortOption,
     savedFilterCombos,
     saveFilterCombo,
-    loadFilterCombo
-  } = useSongPersistence(initialSongs);
+    loadFilterCombo,
+    isLoading
+  } = useServerSongPersistence();
   
-  // Use the album persistence hook
+  // Use the server-side album persistence hook
   const {
     albums,
     isLoaded: albumsLoaded
-  } = useAlbumPersistence();
+  } = useServerAlbumPersistence();
   
   // Get the selected song
   const selectedSong = availableSongs.length > 0 && selectedIndex >= 0 ? 

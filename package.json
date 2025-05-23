@@ -10,11 +10,12 @@
     "server": "node server.js",
     "start": "node server.js",
     "start:network": "./start-network.sh",
-    "security-setup": "node generate-secrets.js",
+    "security-setup": "node setup-security.js",
     "test-imagen": "node test-imagen-api.js",
     "setup": "chmod +x *.sh && ./setup-imagen.sh",
     "quickstart": "chmod +x *.sh && ./start-app.sh",
-    "migrate-game": "node migrate-game-attributes.js"
+    "migrate-game": "node migrate-game-attributes.js",
+    "setup-server-storage": "node setup-security.js"
   },
   "dependencies": {
     "@google/genai": "^0.15.0",
@@ -26,7 +27,9 @@
     "node-fetch": "^2.6.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-markdown": "^9.1.0"
+    "react-markdown": "^9.1.0",
+    "redis": "^4.7.1",
+    "vercel": "^42.1.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.0",
